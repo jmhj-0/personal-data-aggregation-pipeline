@@ -117,6 +117,9 @@ Thumbs.db
 data/
 *.duckdb
 
+# Working documents
+plan.md
+
 # dbt
 dbt/target/
 dbt/dbt_packages/
