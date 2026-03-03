@@ -28,6 +28,12 @@ jobs:
           STEAM_ID: ${{ secrets.STEAM_ID }}
         run: python src/extractors/steam.py
 
+      - name: Run MAL extractor
+        env:
+          MAL_CLIENT_ID: ${{ secrets.MAL_CLIENT_ID }}
+          MAL_USERNAME: ${{ secrets.MAL_USERNAME }}
+        run: python src/extractors/mal.py
+
       - name: Run dbt
         run: |
           cd dbt

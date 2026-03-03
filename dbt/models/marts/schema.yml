@@ -13,3 +13,23 @@ models:
       - name: playtime_minutes
         tests:
           - not_null
+
+  - name: mal_anime
+    columns:
+      - name: mal_id
+        tests:
+          - not_null
+          - unique
+      - name: title
+        tests:
+          - not_null
+
+  - name: mal_manga
+    columns:
+      - name: mal_id
+        tests:
+          - not_null
+          - unique
+      - name: title
+        tests:
+          - not_null

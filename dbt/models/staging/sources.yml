@@ -7,3 +7,5 @@ sources:
       - name: steam_owned_games
       - name: steam_profile
       - name: steam_achievements
+      - name: mal_anime_list
+      - name: mal_manga_list

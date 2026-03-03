@@ -33,6 +33,22 @@ order by last_played_at desc
 limit 10
 ```
 
+```sql mal_summary
+select
+    count(*) filter (list_status = 'completed') as anime_completed,
+    count(*) filter (list_status = 'watching') as anime_watching,
+    round(avg(list_score) filter (list_score is not null), 2) as anime_avg_score
+from personal_data.mal_anime
+```
+
+```sql manga_summary
+select
+    count(*) filter (list_status = 'completed') as manga_completed,
+    count(*) filter (list_status = 'reading') as manga_reading,
+    round(avg(list_score) filter (list_score is not null), 2) as manga_avg_score
+from personal_data.mal_manga
+```
+
 ## Steam
 
 <BigValue data={summary} value="total_games" title="Games Owned" />
@@ -52,3 +68,19 @@ limit 10
 ### Recently Played
 
 <DataTable data={recently_played} />
+
+## Anime
+
+<BigValue data={mal_summary} value="anime_completed" title="Completed" />
+<BigValue data={mal_summary} value="anime_watching" title="Watching" />
+<BigValue data={mal_summary} value="anime_avg_score" title="Avg Score" fmt="num2" />
+
+[View full anime list →](/anime)
+
+## Manga
+
+<BigValue data={manga_summary} value="manga_completed" title="Completed" />
+<BigValue data={manga_summary} value="manga_reading" title="Reading" />
+<BigValue data={manga_summary} value="manga_avg_score" title="Avg Score" fmt="num2" />
+
+[View full manga list →](/manga)
