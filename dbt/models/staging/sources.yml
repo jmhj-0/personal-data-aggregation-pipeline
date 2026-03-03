@@ -1,0 +1,9 @@
+version: 2
+
+sources:
+  - name: raw
+    schema: raw
+    tables:
+      - name: steam_owned_games
+      - name: steam_profile
+      - name: steam_achievements

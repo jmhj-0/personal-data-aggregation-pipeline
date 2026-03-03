@@ -1,37 +1,53 @@
 # Personal Data Aggregation Pipeline
 
-This project aggregates personal data from various online services (Steam, MyAnimeList, X/Twitter, Spotify, GitHub) into a PostgreSQL database for analysis and visualization with Metabase.
+A personal ELT pipeline that pulls data from various online services, loads it into a local DuckDB database, and transforms it with dbt Core. Scheduled via GitHub Actions.
+
+## Stack
+
+- **Extract & Load**: Python (per-source extractor scripts)
+- **Database**: DuckDB (local `.duckdb` file)
+- **Transform**: dbt Core with `dbt-duckdb` adapter
+- **Schedule**: GitHub Actions (daily cron)
+
+## Architecture
+
+```
+API Sources  →  Python extractors  →  DuckDB (raw schema)  →  dbt models  →  DuckDB (marts schema)
+```
+
+Data sources planned:
+- Steam (games, playtime, achievements)
+
+## Project Structure
+
+```
+PersonalDataAggregationPipeline/
+├── src/
+│   └── extractors/          # One script per API source
+├── dbt/                     # dbt project
+│   ├── models/
+│   │   ├── staging/         # Light cleaning of raw tables
+│   │   └── marts/           # Final analytical models
+│   ├── dbt_project.yml
+│   └── profiles.yml
+├── data/                    # Local DuckDB file (gitignored)
+├── .github/
+│   └── workflows/
+│       └── pipeline.yml     # Daily cron job
+├── config/
+│   └── .env.example
+├── requirements.txt
+└── .gitignore
+```
 
 ## Setup
 
-1. Clone or download the project.
-2. Create a virtual environment: `python -m venv venv`
-3. Activate: `venv\Scripts\activate` (Windows)
-4. Install dependencies: `pip install -r requirements.txt`
-5. Set up PostgreSQL database (local or Docker).
-6. Copy `config/.env.example` to `.env` and fill in your API keys and DB credentials.
-7. Run the pipeline: `python src/main.py`
-8. For scheduling: `python src/scheduler.py` (runs daily at 2 AM)
-9. Set up Metabase to connect to the PostgreSQL DB and create dashboards.
+1. Create and activate virtual environment: `python -m venv venv && venv\Scripts\activate`
+2. Install dependencies: `pip install -r requirements.txt`
+3. Copy `config/.env.example` to `.env` and fill in API credentials
+4. Run an extractor: `python src/extractors/steam.py`
+5. Run dbt transforms: `cd dbt && dbt run`
 
-## APIs Required
+## Environment Variables
 
-- Steam: API key and Steam ID
-- MyAnimeList: Client ID and username
-- Twitter: API keys and access tokens
-- Spotify: Client ID/Secret and username
-- GitHub: Personal access token
-
-## Database Schema
-
-See `src/database/schema.sql` for table definitions.
-
-## Testing
-
-Run tests: `python -m unittest tests/test_pipeline.py`
-
-## Notes
-
-- Ensure all API credentials are set in environment variables.
-- PostgreSQL must be running and accessible.
-- For Metabase, use Docker: `docker run -d -p 3000:3000 --name metabase metabase/metabase`
+See `config/.env.example` for required variables.

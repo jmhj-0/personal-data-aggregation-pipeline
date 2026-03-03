@@ -1,0 +1,34 @@
+version: 2
+
+models:
+  - name: stg_steam__owned_games
+    columns:
+      - name: appid
+        tests:
+          - not_null
+          - unique
+      - name: game_name
+        tests:
+          - not_null
+      - name: playtime_minutes
+        tests:
+          - not_null
+
+  - name: stg_steam__profile
+    columns:
+      - name: steamid
+        tests:
+          - not_null
+          - unique
+      - name: display_name
+        tests:
+          - not_null
+
+  - name: stg_steam__achievements
+    columns:
+      - name: appid
+        tests:
+          - not_null
+      - name: achievement_key
+        tests:
+          - not_null

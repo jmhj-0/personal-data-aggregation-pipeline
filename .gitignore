@@ -112,3 +112,13 @@ dmypy.json
 # OS
 .DS_Store
 Thumbs.db
+
+# DuckDB
+data/
+*.duckdb
+
+# dbt
+dbt/target/
+dbt/dbt_packages/
+dbt/logs/
+dbt/.user.yml

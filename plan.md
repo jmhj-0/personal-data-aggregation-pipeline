@@ -1,93 +1,70 @@
-# Personal Data Aggregation Pipeline Plan
+# Personal Data Aggregation Pipeline — Plan
 
-## Project Overview
-This project aims to build a personal data aggregation system that pulls data from various online services (Steam, MyAnimeList, X/Twitter, Spotify, GitHub), cleans and processes it, stores it in a PostgreSQL database, and enables reporting via Metabase dashboards. The system will run as a scheduled pipeline to keep data up-to-date, providing insights into personal digital activity across platforms.
+## Stack
+- **Extract & Load**: Python extractor scripts
+- **Database**: DuckDB (local file `data/personal_data.duckdb`)
+- **Transform**: dbt Core + `dbt-duckdb` adapter
+- **Schedule**: GitHub Actions (daily cron)
 
-## Objectives
-- **Data Ingestion**: Automate pulling of user data from multiple APIs.
-- **Data Processing**: Clean, normalize, and transform raw data for consistency.
-- **Data Storage**: Persist processed data in PostgreSQL with a structured schema.
-- **Reporting**: Create interactive dashboards in Metabase for visualization and analysis.
-- **Scalability**: Design for easy addition of new data sources.
-- **Privacy/Security**: Handle API keys securely and ensure data is stored locally.
+## Pattern
+ELT: extractors write raw data to DuckDB `raw` schema → dbt staging models clean → dbt marts models produce analytical tables.
 
-## Technology Stack
-- **Language**: Python 3.8+
-- **Libraries**:
-  - `requests`: HTTP requests for APIs.
-  - `pandas`: Data cleaning and transformation.
-  - `psycopg2`: PostgreSQL connectivity.
-  - Service-specific: `steam`, `mal-api`, `tweepy`, `spotipy`, `PyGitHub`.
-  - `schedule`: For periodic runs.
-- **Database**: PostgreSQL (local or Docker).
-- **Reporting**: Metabase (Docker-based).
-- **Orchestration**: Cron jobs or Apache Airflow (optional for complexity).
-- **Environment**: Virtualenv for Python dependencies.
+---
 
-## Architecture
-The pipeline follows an ETL (Extract, Transform, Load) pattern:
+## Phases
 
-1. **Extract**: API calls to fetch raw data.
-2. **Transform**: Pandas for cleaning (e.g., handle missing values, standardize formats).
-3. **Load**: Insert into PostgreSQL tables.
+### Phase 1 — Project Scaffolding
+- [x] Create folder structure (`src/extractors/`, `dbt/`, `data/`, `.github/workflows/`, `config/`)
+- [x] Write `requirements.txt` (duckdb, dbt-core, dbt-duckdb, requests, python-dotenv)
+- [x] Write `config/.env.example` with placeholder vars
+- [x] Update `.gitignore` to include `data/`, `*.duckdb`, dbt artifacts
+- [x] Create dbt project files (`dbt/dbt_project.yml`, `dbt/profiles.yml`)
+- [x] Create dbt model directories (`models/staging/`, `models/marts/`)
+- [x] Install dependencies: `pip install -r requirements.txt`
+- [x] Resolve Python 3.14 incompatibility — installed Python 3.12 via winget, rebuilt venv with `py -3.12 -m venv venv`
+- [x] Verified `dbt debug` passes (dbt 1.11.6, dbt-duckdb 1.10.1, DuckDB 1.4.4)
 
-Metabase connects to PostgreSQL for querying and visualization.
+### Phase 2 — Steam Extractor
+- [x] Write `src/extractors/steam.py`
+  - Calls `IPlayerService/GetOwnedGames` — writes to `raw.steam_owned_games`
+  - Calls `ISteamUserStats/GetPlayerAchievements` per game — writes to `raw.steam_achievements`
+  - Calls `ISteamUser/GetPlayerSummaries` — writes to `raw.steam_profile`
+- [x] Steam vars already present in `.env`; removed stale PostgreSQL entries
+- [x] Smoke test passed: 686 games, 1 profile, 28 296 achievements loaded
 
-### High-Level Diagram
-```mermaid
-graph TD
-    A[Data Sources: Steam, MAL, X, Spotify, GitHub] --> B[Ingestion Scripts]
-    B --> C[Pandas Processing]
-    C --> D[PostgreSQL Database]
-    D --> E[Metabase Dashboards]
-    F[Scheduler: Cron/Airflow] --> B
-```
+### Phase 3 — dbt Steam Models
+- [x] `staging/stg_steam__owned_games.sql` — clean and type-cast raw owned games
+- [x] `staging/stg_steam__achievements.sql` — clean raw achievements
+- [x] `staging/stg_steam__profile.sql` — clean raw profile
+- [x] `marts/steam_games.sql` — games with playtime_hours, last_played_at, achievement stats
+- [x] `staging/sources.yml` — defines raw source tables
+- [x] `staging/schema.yml` and `marts/schema.yml` — 13 not_null/unique tests
+- [x] `macros/generate_schema_name.sql` — schema isolation (staging / marts)
+- [x] `dbt run` — 4/4 models OK (0.25s)
+- [x] `dbt test` — 13/13 tests PASS
 
-## Folder Structure
-```
-Projects/PersonalDataAggregationPipeline/
-├── src/
-│   ├── ingestion/
-│   │   ├── steam_ingest.py
-│   │   ├── mal_ingest.py
-│   │   ├── twitter_ingest.py
-│   │   ├── spotify_ingest.py
-│   │   └── github_ingest.py
-│   ├── processing/
-│   │   └── data_cleaner.py
-│   ├── database/
-│   │   ├── schema.sql
-│   │   └── db_utils.py
-│   └── main.py
-├── config/
-│   ├── .env.example
-│   └── config.py
-├── tests/
-│   └── test_pipeline.py
-├── docs/
-│   └── plan.md
-├── requirements.txt
-├── Dockerfile (optional for containerization)
-└── README.md
-```
+### Phase 4 — GitHub Actions Pipeline
+- [ ] Write `.github/workflows/pipeline.yml`
+  - Daily cron trigger
+  - Steps: checkout → setup Python → install deps → run extractor → run dbt
+- [ ] Add `STEAM_API_KEY` and `STEAM_ID` as GitHub Actions secrets
+- [ ] Test workflow run manually via `workflow_dispatch`
 
-## Implementation Steps
-1. Set up project folder and virtual environment.
-2. Install dependencies and configure PostgreSQL.
-3. Design database schema for each data source.
-4. Implement ingestion scripts for each API.
-5. Build data processing module with Pandas.
-6. Integrate database loading.
-7. Set up Metabase and create sample dashboards.
-8. Implement scheduling for automated runs.
-9. Add error handling, logging, and tests.
-10. Document setup and usage.
+### Phase 5 — Additional Sources (to be planned when Phase 4 is complete)
+Candidates (in rough priority order):
+- GitHub (repos, commits, stars)
+- Spotify (listening history, top tracks)
+- MyAnimeList (watch list, ratings)
+- Others TBD
 
-## Assumptions and Risks
-- **APIs**: All sources provide free API access with reasonable limits; user must obtain API keys.
-- **Data Volume**: Personal use, so low volume; scale if needed.
-- **Security**: API keys stored securely; no sensitive data shared.
-- **Risks**: API changes, rate limits; mitigate with retries and monitoring.
+---
 
-## Next Steps
-Review this plan. If approved, proceed to implementation in Code mode.
+## Status Log
+| Date | Work completed |
+|---|---|
+| 2026-03-03 | Project reset; old PostgreSQL/Metabase stack removed |
+| 2026-03-03 | Stack decided: Python + DuckDB + dbt Core + GitHub Actions |
+| 2026-03-03 | Phase 1 complete: folders, requirements.txt, .env.example, .gitignore, dbt_project.yml, profiles.yml, deps installed, dbt debug passing |
+| 2026-03-03 | Note: project venv must use Python 3.12 — dbt-core is incompatible with Python 3.14 (Pydantic v1 limitation) |
+| 2026-03-03 | Phase 2 complete: Steam extractor written and smoke-tested (686 games, 1 profile, 28 296 achievements) |
+| 2026-03-03 | Phase 3 complete: dbt staging views + steam_games mart table, 13/13 tests passing |

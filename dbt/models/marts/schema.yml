@@ -1,0 +1,15 @@
+version: 2
+
+models:
+  - name: steam_games
+    columns:
+      - name: appid
+        tests:
+          - not_null
+          - unique
+      - name: game_name
+        tests:
+          - not_null
+      - name: playtime_minutes
+        tests:
+          - not_null
