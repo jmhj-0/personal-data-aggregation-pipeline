@@ -10,3 +10,6 @@ sources:
       - name: mal_anime_list
       - name: mal_manga_list
       - name: goodreads_books
+      - name: spotify_top_tracks
+      - name: spotify_top_artists
+      - name: spotify_recently_played

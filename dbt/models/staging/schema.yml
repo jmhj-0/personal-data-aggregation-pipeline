@@ -59,6 +59,36 @@ models:
         tests:
           - not_null
 
+  - name: stg_spotify__top_tracks
+    columns:
+      - name: track_id
+        tests:
+          - not_null
+      - name: time_range
+        tests:
+          - not_null
+      - name: rank
+        tests:
+          - not_null
+
+  - name: stg_spotify__top_artists
+    columns:
+      - name: artist_id
+        tests:
+          - not_null
+      - name: time_range
+        tests:
+          - not_null
+
+  - name: stg_spotify__recently_played
+    columns:
+      - name: played_at
+        tests:
+          - not_null
+      - name: track_name
+        tests:
+          - not_null
+
   - name: stg_mal__manga_list
     columns:
       - name: mal_id

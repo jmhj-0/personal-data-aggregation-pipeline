@@ -34,6 +34,13 @@ jobs:
           MAL_USERNAME: ${{ secrets.MAL_USERNAME }}
         run: python src/extractors/mal.py
 
+      - name: Run Spotify extractor
+        env:
+          SPOTIFY_CLIENT_ID: ${{ secrets.SPOTIFY_CLIENT_ID }}
+          SPOTIFY_CLIENT_SECRET: ${{ secrets.SPOTIFY_CLIENT_SECRET }}
+          SPOTIFY_REFRESH_TOKEN: ${{ secrets.SPOTIFY_REFRESH_TOKEN }}
+        run: python src/extractors/spotify.py
+
       - name: Run Goodreads extractor
         env:
           GOODREADS_USER_ID: ${{ secrets.GOODREADS_USER_ID }}
