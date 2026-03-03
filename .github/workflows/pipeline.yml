@@ -34,6 +34,11 @@ jobs:
           MAL_USERNAME: ${{ secrets.MAL_USERNAME }}
         run: python src/extractors/mal.py
 
+      - name: Run Goodreads extractor
+        env:
+          GOODREADS_USER_ID: ${{ secrets.GOODREADS_USER_ID }}
+        run: python src/extractors/goodreads.py
+
       - name: Run dbt
         run: |
           cd dbt

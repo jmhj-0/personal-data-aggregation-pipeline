@@ -24,6 +24,16 @@ models:
         tests:
           - not_null
 
+  - name: goodreads_books
+    columns:
+      - name: book_id
+        tests:
+          - not_null
+          - unique
+      - name: title
+        tests:
+          - not_null
+
   - name: mal_manga
     columns:
       - name: mal_id

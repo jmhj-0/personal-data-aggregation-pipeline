@@ -46,6 +46,19 @@ models:
         tests:
           - not_null
 
+  - name: stg_goodreads__books
+    columns:
+      - name: book_id
+        tests:
+          - not_null
+          - unique
+      - name: title
+        tests:
+          - not_null
+      - name: shelf
+        tests:
+          - not_null
+
   - name: stg_mal__manga_list
     columns:
       - name: mal_id

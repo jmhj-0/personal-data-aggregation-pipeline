@@ -9,3 +9,4 @@ sources:
       - name: steam_achievements
       - name: mal_anime_list
       - name: mal_manga_list
+      - name: goodreads_books
