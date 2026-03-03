@@ -120,6 +120,11 @@ data/
 # Working documents
 plan.md
 
+# Evidence dashboard
+dashboard/node_modules/
+dashboard/.evidence/
+dashboard/build/
+
 # dbt
 dbt/target/
 dbt/dbt_packages/

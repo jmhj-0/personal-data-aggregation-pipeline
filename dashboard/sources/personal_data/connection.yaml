@@ -1,0 +1,4 @@
+name: personal_data
+type: duckdb
+options:
+  filename: ../../../data/personal_data.duckdb

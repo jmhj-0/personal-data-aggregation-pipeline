@@ -23,7 +23,7 @@ SELECT
     COALESCE(a.achievements_unlocked, 0) AS achievements_unlocked,
     CASE
         WHEN COALESCE(a.total_achievements, 0) = 0 THEN NULL
-        ELSE ROUND(a.achievements_unlocked * 100.0 / a.total_achievements, 1)
+        ELSE ROUND(a.achievements_unlocked * 1.0 / a.total_achievements, 3)
     END AS achievement_completion_pct,
     g._loaded_at
 FROM games g
