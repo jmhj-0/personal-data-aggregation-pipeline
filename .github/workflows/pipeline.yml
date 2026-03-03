@@ -58,3 +58,25 @@ jobs:
           name: personal-data-${{ github.run_id }}
           path: data/personal_data.duckdb
           retention-days: 7
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+          cache: "npm"
+          cache-dependency-path: dashboard/package-lock.json
+
+      - name: Install dashboard dependencies
+        run: cd dashboard && npm ci
+
+      - name: Build and deploy dashboard
+        env:
+          VERCEL_TOKEN: ${{ secrets.VERCEL_TOKEN }}
+          VERCEL_ORG_ID: ${{ secrets.VERCEL_ORG_ID }}
+          VERCEL_PROJECT_ID: ${{ secrets.VERCEL_PROJECT_ID }}
+        run: |
+          cd dashboard
+          npm run sources
+          npx vercel pull --yes --environment=production --token=$VERCEL_TOKEN
+          npx vercel build --prod --token=$VERCEL_TOKEN
+          npx vercel deploy --prebuilt --prod --token=$VERCEL_TOKEN

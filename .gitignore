@@ -124,6 +124,8 @@ plan.md
 dashboard/node_modules/
 dashboard/.evidence/
 dashboard/build/
+dashboard/.vercel/
+dashboard/.env.local
 
 # dbt
 dbt/target/
