@@ -154,3 +154,50 @@ from personal_data.goodreads_books
 <BigValue data={now_reading_book} value="title" title="Currently Reading" />
 
 [Full reading list →](/goodreads/books)
+
+---
+
+```sql github_summary
+select
+    count(*) filter (is_fork = false) as own_repos,
+    sum(stargazers_count) filter (is_fork = false) as total_stars,
+    max(pushed_at)::date as last_pushed
+from personal_data.github_repos
+```
+
+## GitHub
+
+<BigValue data={github_summary} value="own_repos" title="Repos" />
+<BigValue data={github_summary} value="total_stars" title="Stars" />
+<BigValue data={github_summary} value="last_pushed" title="Last Push" />
+
+[All repositories →](/github/repos)
+
+---
+
+```sql x_summary
+select
+    followers_count,
+    following_count
+from personal_data.x_profile
+limit 1
+```
+
+```sql x_recent
+select
+    text,
+    created_at::date as date,
+    total_engagements
+from personal_data.x_tweets
+order by created_at desc
+limit 5
+```
+
+## X
+
+<BigValue data={x_summary} value="followers_count" title="Followers" />
+<BigValue data={x_summary} value="following_count" title="Following" />
+
+<DataTable data={x_recent} title="Recent Tweets" />
+
+[All tweets →](/x/tweets)

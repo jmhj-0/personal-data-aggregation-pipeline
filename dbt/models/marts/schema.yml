@@ -68,3 +68,23 @@ models:
       - name: title
         tests:
           - not_null
+
+  - name: github_repos
+    columns:
+      - name: repo_id
+        tests:
+          - not_null
+          - unique
+      - name: repo_name
+        tests:
+          - not_null
+
+  - name: x_tweets
+    columns:
+      - name: tweet_id
+        tests:
+          - not_null
+          - unique
+      - name: created_at
+        tests:
+          - not_null

@@ -46,6 +46,18 @@ jobs:
           GOODREADS_USER_ID: ${{ secrets.GOODREADS_USER_ID }}
         run: python src/extractors/goodreads.py
 
+      - name: Run GitHub extractor
+        env:
+          GH_PAT: ${{ secrets.GH_PAT }}
+          GH_USERNAME: ${{ secrets.GH_USERNAME }}
+        run: python src/extractors/github.py
+
+      - name: Run X extractor
+        env:
+          X_BEARER_TOKEN: ${{ secrets.X_BEARER_TOKEN }}
+          X_USERNAME: ${{ secrets.X_USERNAME }}
+        run: python src/extractors/x.py
+
       - name: Run dbt
         run: |
           cd dbt

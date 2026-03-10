@@ -1,0 +1,1 @@
+select * from marts.x_profile

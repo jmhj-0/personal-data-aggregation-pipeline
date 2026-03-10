@@ -13,3 +13,7 @@ sources:
       - name: spotify_top_tracks
       - name: spotify_top_artists
       - name: spotify_recently_played
+      - name: github_profile
+      - name: github_repos
+      - name: x_profile
+      - name: x_tweets
