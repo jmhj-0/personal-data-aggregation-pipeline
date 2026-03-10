@@ -47,6 +47,39 @@ def _get_user_id(bearer_token: str, username: str) -> str:
     return data["data"]["id"]
 
 
+def _ensure_tables(conn: duckdb.DuckDBPyConnection) -> None:
+    """Create empty raw X tables if they don't exist, so dbt can always run."""
+    conn.execute("DROP TABLE IF EXISTS raw.x_profile")
+    conn.execute("""
+        CREATE TABLE raw.x_profile (
+            user_id VARCHAR,
+            name VARCHAR,
+            username VARCHAR,
+            description VARCHAR,
+            followers_count INTEGER,
+            following_count INTEGER,
+            tweet_count INTEGER,
+            listed_count INTEGER,
+            created_at VARCHAR,
+            _loaded_at TIMESTAMPTZ
+        )
+    """)
+    conn.execute("DROP TABLE IF EXISTS raw.x_tweets")
+    conn.execute("""
+        CREATE TABLE raw.x_tweets (
+            tweet_id VARCHAR,
+            text VARCHAR,
+            created_at VARCHAR,
+            retweet_count INTEGER,
+            reply_count INTEGER,
+            like_count INTEGER,
+            quote_count INTEGER,
+            impression_count INTEGER,
+            _loaded_at TIMESTAMPTZ
+        )
+    """)
+
+
 def load_profile(conn: duckdb.DuckDBPyConnection, bearer_token: str, username: str) -> str:
     """Fetch user profile and load into raw.x_profile. Returns the user ID."""
     data = _x_get(
@@ -71,21 +104,6 @@ def load_profile(conn: duckdb.DuckDBPyConnection, bearer_token: str, username: s
         loaded_at,
     )]
 
-    conn.execute("DROP TABLE IF EXISTS raw.x_profile")
-    conn.execute("""
-        CREATE TABLE raw.x_profile (
-            user_id VARCHAR,
-            name VARCHAR,
-            username VARCHAR,
-            description VARCHAR,
-            followers_count INTEGER,
-            following_count INTEGER,
-            tweet_count INTEGER,
-            listed_count INTEGER,
-            created_at VARCHAR,
-            _loaded_at TIMESTAMPTZ
-        )
-    """)
     conn.executemany("INSERT INTO raw.x_profile VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)", records)
 
     logger.info("Loaded profile for @%s into raw.x_profile", username)
@@ -121,20 +139,6 @@ def load_tweets(conn: duckdb.DuckDBPyConnection, bearer_token: str, user_id: str
         for tweet in tweets
     ]
 
-    conn.execute("DROP TABLE IF EXISTS raw.x_tweets")
-    conn.execute("""
-        CREATE TABLE raw.x_tweets (
-            tweet_id VARCHAR,
-            text VARCHAR,
-            created_at VARCHAR,
-            retweet_count INTEGER,
-            reply_count INTEGER,
-            like_count INTEGER,
-            quote_count INTEGER,
-            impression_count INTEGER,
-            _loaded_at TIMESTAMPTZ
-        )
-    """)
     conn.executemany("INSERT INTO raw.x_tweets VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)", records)
 
     logger.info("Loaded %d tweets into raw.x_tweets", len(records))
@@ -154,8 +158,12 @@ def main() -> None:
 
     conn = _get_conn()
     try:
-        user_id = load_profile(conn, bearer_token, username)
-        load_tweets(conn, bearer_token, user_id)
+        _ensure_tables(conn)
+        try:
+            user_id = load_profile(conn, bearer_token, username)
+            load_tweets(conn, bearer_token, user_id)
+        except requests.HTTPError as exc:
+            logger.warning("X API request failed (%s) — raw tables will be empty", exc)
     finally:
         conn.close()
 
