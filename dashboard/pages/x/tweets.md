@@ -1,11 +1,11 @@
 # X — Tweets
 
-```sql x_profile
+```sql x_user
 select
     followers_count,
     following_count,
     tweet_count
-from personal_data.x_profile
+from personal_data.x_user
 limit 1
 ```
 
@@ -45,9 +45,9 @@ from personal_data.x_tweets
 order by created_at desc
 ```
 
-<BigValue data={x_profile} value="followers_count" title="Followers" />
-<BigValue data={x_profile} value="following_count" title="Following" />
-<BigValue data={x_profile} value="tweet_count" title="Total Tweets" />
+<BigValue data={x_user} value="followers_count" title="Followers" />
+<BigValue data={x_user} value="following_count" title="Following" />
+<BigValue data={x_user} value="tweet_count" title="Total Tweets" />
 <BigValue data={engagement_summary} value="avg_engagements_per_tweet" title="Avg Engagements" fmt="num1" />
 
 ### Top Tweets by Engagement

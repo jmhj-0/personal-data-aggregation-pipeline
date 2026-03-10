@@ -179,7 +179,7 @@ from personal_data.github_repos
 select
     followers_count,
     following_count
-from personal_data.x_profile
+from personal_data.x_user
 limit 1
 ```
 
