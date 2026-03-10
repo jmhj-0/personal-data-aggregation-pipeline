@@ -53,6 +53,7 @@ jobs:
         run: python src/extractors/github.py
 
       - name: Run X extractor
+        continue-on-error: true
         env:
           X_BEARER_TOKEN: ${{ secrets.X_BEARER_TOKEN }}
           X_USERNAME: ${{ secrets.X_USERNAME }}
